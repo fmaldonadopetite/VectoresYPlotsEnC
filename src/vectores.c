@@ -1,6 +1,6 @@
 #include "vectores.h"
 
-
+#if defined CORRER
 u32 suma(u32 x, u32 y){
      return x+y;
  }
@@ -25,6 +25,8 @@ int main(void){
     fvector_destroy(fvec);
     return 0;
 }
+#endif
+
 
 /*
   ____                _                   _                      

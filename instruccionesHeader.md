@@ -90,6 +90,7 @@ SÍ va en un archivo header:
 1. Declaraciones de funciones.
 2. Definiciones de tipos personalizados (enums y structs).
 3. Directivas de preprocesador como #define e #include.
+
 NO va en un archivo header:
 1. Nada que aloje memoria, como declaraciones de variables y constantes.
 2. Definiciones de funciones.
