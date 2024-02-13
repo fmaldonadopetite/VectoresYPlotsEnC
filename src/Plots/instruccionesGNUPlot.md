@@ -1,0 +1,10 @@
+https://riptutorial.com/gnuplot/example/12382/plot-a-single-data-file
+https://riptutorial.com/gnuplot/example/27408/plotting-multiple-data-files
+https://www.youtube.com/watch?v=9QUtcfyBFhE
+https://stackoverflow.com/questions/3521209/making-c-code-plot-a-graph-automatically
+https://hirophysics.com/gnuplot/gnuplot08.html
+https://stackoverflow.com/questions/19740496/how-to-fix-gnuplot-replot-issue
+https://stackoverflow.com/questions/13580236/gnuplot-max-and-min-values-in-a-range
+https://stackoverflow.com/questions/37965179/editing-y-axis-range-in-gnuplot
+https://www.cs.hmc.edu/~vrable/gnuplot/using-gnuplot.html
+https://stackoverflow.com/questions/9550959/reusing-inline-data-in-gnuplot

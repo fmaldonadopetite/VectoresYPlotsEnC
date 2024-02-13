@@ -1,4 +1,5 @@
 #include "vectores.h"
+//Obs, los vectores float no comienzan con mayúscula
 
 #if defined CORRER
 u32 suma(u32 x, u32 y){
@@ -7,6 +8,7 @@ u32 suma(u32 x, u32 y){
 
 
 int main(void){
+    //prueva Vector, fVector
     Vector vec = vector_create_range(0, 6, 1);
     fVector fvec = fvector_create(vec.size);
     vector_to_fvector(fvec, vec);
@@ -23,6 +25,14 @@ int main(void){
     printf("%d\n", vector_fold(vec, suma));
     vector_destroy(vec);
     fvector_destroy(fvec);
+
+    //prueba Vec2, fVec2
+    Vec2 v = vec2(4,10);
+    fVec2 fv2 = fvec2(vec2_norm(v),  vec2_norm(v));
+    printf("(%f, %f)\n", fv2.x, fv2.y);
+    vec2_dot_multiply(v, 5);
+    fv2 = fvec2(vec2_norm(v),  vec2_norm(v));
+    printf("(%f, %f)\n", fv2.x, fv2.y);
     return 0;
 }
 #endif
@@ -126,19 +136,22 @@ void fvector_destroy(fVector vector){
       |_|                                                
       */
 //vec2
-void vec2_dot_add(Vec2 vector, u32 num){
+Vec2 vec2_dot_add(Vec2 vector, i32 num){
     vector.x += num;
     vector.y += num;
+    return vector;
 }
 
-void vec2_dot_divide(Vec2 vector, u32 num){
+Vec2 vec2_dot_divide(Vec2 vector, i32 num){
     vector.x /= num;
     vector.y /= num;
+    return vector;
 }
 
-void vec2_dot_multiply(Vec2 vector, int num){
+Vec2 vec2_dot_multiply(Vec2 vector, int num){
     vector.x *= num;
     vector.y *= num;
+    return vector;
 }
 
 i32 vec2_inner_prod(Vec2 vector1, Vec2 vector2){
@@ -151,7 +164,7 @@ Vec2 vec2_multiply( Vec2 vector1, Vec2 vector2){
     return v;
 }
 
-Vec2 vect2_add( Vec2 vector1, Vec2 vector2){
+Vec2 vec2_add( Vec2 vector1, Vec2 vector2){
     u32 x = vector1.x - vector2.x;
     u32 y = vector1.y - vector2.y;
     Vec2 v = {x,y};
@@ -167,6 +180,51 @@ Vec2 vec2_map( Vec2 vector, i32 (*func)(i32)){
     u32 x = func(vector.x);
     u32 y = func(vector.y);
     Vec2 v = {x,y};
+    return v;
+}
+
+//fvec2
+void fvec2_dot_add(fVec2 vector, u32 num){
+    vector.x += num;
+    vector.y += num;
+}
+
+void fvec2_dot_divide(fVec2 vector, u32 num){
+    vector.x /= num;
+    vector.y /= num;
+}
+
+void fvec2_dot_multiply(fVec2 vector, int num){
+    vector.x *= num;
+    vector.y *= num;
+}
+
+double fvec2_inner_prod(fVec2 vector1, Vec2 vector2){
+    return vector1.x * vector2.x + vector1.y * vector2.y;
+}
+Vec2 fvec2_multiply( fVec2 vector1, fVec2 vector2){
+    u32 x = vector1.x * vector2.x;
+    u32 y = vector1.y * vector2.y;
+    Vec2 v = {x,y};
+    return v;
+}
+
+Vec2 fvec2_add( fVec2 vector1, fVec2 vector2){
+    u32 x = vector1.x - vector2.x;
+    u32 y = vector1.y - vector2.y;
+    Vec2 v = {x,y};
+    return v;
+}
+
+double fvec2_norm(fVec2 vector){
+    double num = sqrt(vector.x * vector.x + vector.x * vector.x);
+    return num;
+}
+
+fVec2 fvec2_map( fVec2 vector, i32 (*func)(i32)){
+    double x = func(vector.x);
+    double y = func(vector.y);
+    fVec2 v = {x,y};
     return v;
 }
 

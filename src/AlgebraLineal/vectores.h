@@ -53,16 +53,15 @@ typedef struct {
 |  _|| |_| | | | | (__| | (_) | | | |  __/\__ \
 |_|   \__,_|_| |_|\___|_|\___/|_| |_|\___||___/
 */
-                                              
-                                                                 
 
 //constructores
 Vec2 vec2(u32 x,u32 y);
 fVec2 fvec2(double x,double y);
 
 Vector vector_create(u32 size);
+//lalala
 Vector vector_create_range(i32 start, i32 end, i32 step);
-void vector_destroy(Vector vector);
+void vector_destroy(Vector vector);//lalalal
 
 fVector fvector_create(u32 size);
 fVector fvector_create_range(double start, double end, double step);
@@ -70,9 +69,9 @@ void fvector_destroy(fVector vector);
 
 
 //operaciones
-void vec2_dot_add(Vec2 vector, u32 num);
-void vec2_dot_divide(Vec2 vector, u32 num);
-void vec2_dot_multiply(Vec2 vector, int num);
+Vec2 vec2_dot_add(Vec2 vector, i32 num);
+Vec2 vec2_dot_divide(Vec2 vector, i32 num);
+Vec2 vec2_dot_multiply(Vec2 vector, int num);
 i32 vec2_inner_prod(Vec2 vector1, Vec2 vector2);
 Vec2 vec2_multiply( Vec2 vector1, Vec2 vector2);
 Vec2 vect2_add( Vec2 vector1, Vec2 vector2);
