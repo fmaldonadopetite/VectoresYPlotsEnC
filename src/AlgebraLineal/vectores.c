@@ -8,23 +8,23 @@ u32 suma(u32 x, u32 y){
 
 
 int main(void){
-    //prueva Vector, fVector
-    Vector vec = vector_create_range(0, 6, 1);
-    fVector fvec = fvector_create(vec.size);
-    vector_to_fvector(fvec, vec);
-    fvector_dot_add(fvec,5);
-    //fvector_add(fvec, fvec, fvec);
-    fvector_dot_divide(fvec, 7);
-    fvector_map(fvec, fvec, exp);
-    for (size_t i=0; i<vec.size; i++){
-        printf("%f", fvec.v[i]);
+    //prueva Vector, Vector
+    iVector ivec = ivector_create_range(0, 6, 1);
+    Vector vec = vector_create(ivec.size);
+    ivector_to_vector(vec, ivec);
+    vector_dot_add(vec,5);
+    //vector_add(fvec, fvec, fvec);
+    vector_dot_divide(vec, 7);
+    vector_map(vec, vec, exp);
+    for (size_t i=0; i<ivec.size; i++){
+        printf("%f", vec.v[i]);
         printf("\n");
     }
-    vector_dot_multiply(vec, 0);
-    vector_dot_add(vec, 1);
-    printf("%d\n", vector_fold(vec, suma));
+    ivector_dot_multiply(ivec, 0);
+    ivector_dot_add(ivec, 1);
+    printf("%d\n", ivector_fold(ivec, suma));
+    ivector_destroy(ivec);
     vector_destroy(vec);
-    fvector_destroy(fvec);
 
     //prueba Vec2, fVec2
     Vec2 v = vec2(4,10);
@@ -56,9 +56,9 @@ fVec2 fvec2(double x,double y){
     return vec;
 }
 
-Vector vector_create(u32 size){
+iVector ivector_create(u32 size){
     i32 *v = calloc(size, sizeof(i32));
-    Vector vector = {0};
+    iVector vector = {0};
     if(v)  {
         vector.size = size;
         vector.v = v;
@@ -67,9 +67,15 @@ Vector vector_create(u32 size){
     return vector;
 }
 
-Vector vector_create_range(i32 start, i32 end, i32 step){
+iVector ivector_create_copy(iVector vector){
+    iVector new_vector = ivector_create(vector.size);
+    ivector_add(new_vector, vector, new_vector);
+    return new_vector;
+}
+
+iVector ivector_create_range(i32 start, i32 end, i32 step){
     //start + size*step = end
-    Vector vector = {0};
+    iVector vector = {0};
 
     if (end<=start) return vector;
 
@@ -86,14 +92,14 @@ Vector vector_create_range(i32 start, i32 end, i32 step){
     return vector;
 }
 
-void vector_destroy(Vector vector){
+void ivector_destroy(iVector vector){
     free(vector.v);
 }
 
-fVector fvector_create(u32 size){
+Vector vector_create(u32 size){
 
     double *v = calloc(size, sizeof(double));
-    fVector vector = {0};
+    Vector vector = {0};
     if(v)  {
         vector.size = size;
         vector.v = v;
@@ -102,9 +108,15 @@ fVector fvector_create(u32 size){
     return vector;
 }
 
-fVector fvector_create_range(double start, double end, double step){
+Vector vector_create_copy(Vector vector){
+    Vector new_vector = vector_create(vector.size);
+    vector_add(new_vector, vector, new_vector);
+    return new_vector;
+}
+
+Vector vector_create_range(double start, double end, double step){
     //start + size*step = end
-    fVector vector = {0};
+    Vector vector = {0};
 
     if (end<=start) return vector;
 
@@ -122,7 +134,7 @@ fVector fvector_create_range(double start, double end, double step){
     return vector;
 }
 
-void fvector_destroy(fVector vector){
+void vector_destroy(Vector vector){
     free(vector.v);
 }
 
@@ -228,48 +240,51 @@ fVec2 fvec2_map( fVec2 vector, i32 (*func)(i32)){
     return v;
 }
 
-//vector
-void vector_dot_add(Vector vector, u32 num){
+//ivector
+u32 ivector_len(iVector vector){
+    return vector.size;
+}
+void ivector_dot_add(iVector vector, u32 num){
     for(size_t i=0; i<vector.size; i++ ){
         vector.v[i] += num;
     }
 }
 
-void vector_dot_divide(Vector vector, u32 num){
+void ivector_dot_divide(iVector vector, u32 num){
     for(size_t i=0; i<vector.size; i++ ){
         vector.v[i] /= num;
     }
 }
 
-void vector_dot_multiply(Vector vector, int num){
+void ivector_dot_multiply(iVector vector, int num){
     for(size_t i=0; i<vector.size; i++ ){
         vector.v[i] *= num;
     }
 }
 
-i32 vector_inner_prod(Vector vector1, Vector vector2){
-    assert((vector1.size == vector2.size) && "message");
+i32 ivector_inner_prod(iVector vector1, iVector vector2){
+    assert((vector1.size == vector2.size) && "vectores deben ser de igual tamaño");
     i32 result = 0;
     for(size_t i=0; i<vector1.size; i++ ){
         result += vector1.v[i] * vector2.v[i];
     }
     return result;
 }
-void vector_multiply(Vector result, Vector vector1, Vector vector2){
-    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "message");
+void ivector_multiply(iVector result, iVector vector1, iVector vector2){
+    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "vectores deben ser de igual tamaño");
     for(size_t i=0; i<vector1.size; i++ ){
         result.v[i] = vector1.v[i] * vector2.v[i];
     }
 }
 
-void vector_add(Vector result, Vector vector1, Vector vector2){
-    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "message");
+void ivector_add(iVector result, iVector vector1, iVector vector2){
+    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "vectores deben ser de igual tamaño");
     for(size_t i=0; i<vector1.size; i++ ){
         result.v[i] = vector1.v[i] + vector2.v[i];
     }
 }
 
-double vector_norm(Vector vector){
+double ivector_norm(iVector vector){
     u32 result=0;
     for(size_t i=0; i<vector.size; i++ ){
         result += vector.v[i]*vector.v[i]; 
@@ -277,13 +292,13 @@ double vector_norm(Vector vector){
     return sqrt(result);
 }
 
-void vector_map(Vector result, Vector vector, i32 (*func)(i32)){
+void ivector_map(iVector result, iVector vector, i32 (*func)(i32)){
     for(size_t i=0; i<vector.size; i++ ){
         result.v[i] = func(vector.v[i]);
     }
 }
 
-u32 vector_fold(Vector vector, u32 (*func)(u32, u32)){
+u32 ivector_fold(iVector vector, u32 (*func)(u32, u32)){
     u32 result =  vector.v[0];
     for(size_t i=1; i<vector.size; i++ ){
         result = func(vector.v[i], result);
@@ -291,55 +306,59 @@ u32 vector_fold(Vector vector, u32 (*func)(u32, u32)){
     return result;
 }
 
-void vector_to_fvector(fVector result, Vector vector){
+void ivector_to_vector(Vector result, iVector vector){
     for(size_t i=0; i<vector.size; i++ ){
         result.v[i] = (double) vector.v[i];
     }
     
 }
 
-//fvector
-void fvector_dot_add(fVector vector, double num){
+//vector
+u32 vector_len(Vector vector){
+    return vector.size;
+}
+
+void vector_dot_add(Vector vector, double num){
     for(size_t i=0; i<vector.size; i++ ){
         vector.v[i] += num;
     }
 }
 
-void fvector_dot_divide(fVector vector, double num){
+void vector_dot_divide(Vector vector, double num){
     for(size_t i=0; i<vector.size; i++ ){
         vector.v[i] /= num;
     }
 }
 
-void fvector_dot_multiply(fVector vector, double num){
+void vector_dot_multiply(Vector vector, double num){
     for(size_t i=0; i<vector.size; i++ ){
         vector.v[i] *= num;
     }
 }
 
-double fvector_inner_prod(fVector vector1, fVector vector2){
-    assert((vector1.size == vector2.size) && "message");
+double vector_inner_prod(Vector vector1, Vector vector2){
+    assert((vector1.size == vector2.size) && "vectores deben ser de igual tamaño");
     double result = 0;
     for(size_t i=0; i<vector1.size; i++ ){
         result += vector1.v[i] * vector2.v[i];
     }
     return result;
 }
-void fvector_multiply(fVector result, fVector vector1, fVector vector2){
-    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "message");
+void vector_multiply(Vector result, Vector vector1, Vector vector2){
+    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "vectores deben ser de igual tamaño");
     for(size_t i=0; i<vector1.size; i++ ){
         result.v[i] = vector1.v[i] * vector2.v[i];
     }
 }
 
-void fvector_add(fVector result, fVector vector1, fVector vector2){
-    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "message");
+void vector_add(Vector result, Vector vector1, Vector vector2){
+    assert((result.size == vector1.size ) && (vector1.size == vector2.size) && "vectores deben ser de igual tamaño");
     for(size_t i=0; i<vector1.size; i++ ){
         result.v[i] = vector1.v[i] + vector2.v[i];
     }
 }
 
-double fvector_norm(fVector vector){
+double vector_norm(Vector vector){
     double result=0;
     for(size_t i=0; i<vector.size; i++ ){
         result += vector.v[i]*vector.v[i]; 
@@ -347,13 +366,13 @@ double fvector_norm(fVector vector){
     return sqrt(result);
 }
 
-void fvector_map(fVector result, fVector vector, double (*func)(double)){
+void vector_map(Vector result, Vector vector, double (*func)(double)){
     for(size_t i=0; i<vector.size; i++ ){
         result.v[i] = func(vector.v[i]);
     }
 }
 
-double fvector_fold(fVector vector, double (*func)(double, double)){
+double vector_fold(Vector vector, double (*func)(double, double)){
     double result =  vector.v[0];
     for(size_t i=1; i<vector.size; i++ ){
         result = func(vector.v[i], result);
