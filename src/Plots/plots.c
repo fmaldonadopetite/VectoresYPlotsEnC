@@ -1,5 +1,7 @@
 #include "../AlgebraLineal/vectores.h"
+#include <locale.h>
 #include <time.h>
+//Podría implementar una estructura PlotComponent, que incluyera x,y,label,color, estilo, y permitiera agregar flexibilidad a la entrada de plot_add, definiendo un método diferente plot_add_component(PlotComponent instancia);
 
 
 #define MAXTITLE 100
@@ -32,7 +34,7 @@ typedef struct {
 Plot plot_create(char *title);
 void plot_destroy(Plot plot);
 void plot_add(Plot *plot, Vector x, Vector y, char *label);
-void plot_draw(Plot plot);
+void plot_draw(Plot *plot);
 
 
 #if defined CORRER
@@ -48,6 +50,7 @@ int main(void){
     plot_add(&plot, x1,y1, "lineal");
     vector_map(y2, y2, cos);
     plot_add(&plot, x2,y2, "coseno cuadrático");
+    plot_draw(&plot);
     
     vector_destroy(x1);
     vector_destroy(y1);
@@ -56,7 +59,7 @@ int main(void){
     vector_dot_divide(y1, 20);
     vector_map(y1, y1, exp);
     plot_add(&plot, x1,y1, "exponencial");
-    plot_draw(plot);
+    plot_draw(&plot);
 
 
     plot_destroy(plot);
@@ -90,17 +93,20 @@ Plot plot_create(char *title) {
 void plot_destroy(Plot plot){
     fclose(plot.temp_file);
     remove(plot.temp_file_name); 
+    colaLabels_destroy(plot.labels);
 }
 
-void plot_draw(Plot plot){
+void plot_draw(Plot *plot){
     FILE *plot_pipe = popen ("gnuplot-qt -persistent", "w");
-    char *final_command = malloc(MAXTITLE + (MAXFILENAME + MAXTITLE +100)*plot.nplots +1);
+    char *final_command = malloc(MAXTITLE + (MAXFILENAME + MAXTITLE +100)*plot->nplots +1);
+    ColaLabels *new_labels = colaLabels_create();//para reciclar los labels y poder dibujar el plot más de una vez
+    char *ptr, *ptr2;
 
-    //settings previos (~100 caracteres)
+    //settings previos (~MAXTITLE caracteres)
     char *settings1 = "set grid; set title \"";
     char *settings2 = "\" ;";
-    char *title = plot.title;
-    char *ptr = final_command;
+    char *title = plot->title;
+    ptr = final_command;
     while( (*ptr++ = *settings1++) );
     ptr--;
     while( (*ptr++ = *title++) );
@@ -108,29 +114,26 @@ void plot_draw(Plot plot){
     while( (*ptr++ = *settings2++) );
     ptr--;
 
-    //plots (~132* num_plots caracteres)
-    char *ptr2;
-
-    char *file_name = plot.temp_file_name;
+    //plot como tal
     char *command_start = "plot ";
-    i32 columna1, columna2;
-
     ptr2 = command_start;
     while( (*ptr++ = *ptr2++) );
     ptr--;
-    for (u32 i=0; i<plot.nplots; i++){
-        //agregar "plot \'{plot.temp_file_name}\' using {(2*i+1)}:{(2*i+2)} title \'{label}\' with linespoint,;" <- 100 + 32 chars
+    for (u32 i=0; i<plot->nplots; i++){
+        //agregar "\'{plot.temp_file_name}\' using {(2*i+1)}:{(2*i+2)} title \'{label}\' with linespoint,;" <-  ~MAXFILENAME + 100 chars
+        char *file_name = plot->temp_file_name;
+        i32 columna1, columna2;
         columna1 = 2*i+1;
         columna2 = 2*i+2;
-        char *label = colaLabels_get(plot.labels);
+        char *label = colaLabels_get(plot->labels);
+        colaLabels_put(new_labels, label);
 
-        char nuevaLinea[MAXFILENAME + 100];
-        snprintf(nuevaLinea, MAXFILENAME + 100, "\'%s\' using %d:%d title \'%s\' with lines,", file_name, columna1, columna2, label );
+        char nuevaLinea[MAXFILENAME + 100 + 1];
+        snprintf(nuevaLinea, MAXFILENAME + 100 + 1, "\'%s\' using %d:%d title \'%s\' with lines,", file_name, columna1, columna2, label );
         ptr2 = nuevaLinea;
         while( (*ptr++ = *ptr2++) );
         ptr--;
 
-        free(label);
     }
     ptr--;//para borrar la última coma
     *ptr='\0';
@@ -138,6 +141,8 @@ void plot_draw(Plot plot){
     fprintf(plot_pipe, "%s \n", final_command); 
     pclose(plot_pipe);
     free(final_command);
+    colaLabels_destroy(plot->labels);
+    plot->labels = new_labels;
 }
 
 void plot_add(Plot *plot, Vector x, Vector y, char *label){
@@ -214,7 +219,6 @@ void plot_add(Plot *plot, Vector x, Vector y, char *label){
 
     while( (*p1++=*p2++) );
     
-    printf("%s", newLabel);
     colaLabels_put(plot->labels, newLabel);
 }
 
